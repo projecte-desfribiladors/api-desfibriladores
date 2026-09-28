@@ -50,5 +50,26 @@ def obtener_tres_mas_cercanos(lat: float, lng: float):
     # Ordenamos la lista por la distancia de menor a mayor
     lista_ordenada = sorted(lista_con_distancias, key=lambda x: x["dist_m"])
 
-    # Devolvemos SOLO los 3 primeros
-    return lista_ordenada[:3]
+    # --- FILTRAR DUPLICADOS ---
+    deas_filtrados = []
+    for dea in lista_ordenada:
+        nombre = dea.get("n", "").strip().lower()
+        direccion = dea.get("dir", "").strip().lower()
+        
+        es_duplicado = False
+        for guardado in deas_filtrados:
+            nombre_guardado = guardado.get("n", "").strip().lower()
+            dir_guardada = guardado.get("dir", "").strip().lower()
+            
+            # Si coinciden dirección, nombre o están a menos de 30 metros, lo ignora
+            if direccion == dir_guardada or nombre == nombre_guardado or abs(dea["dist_m"] - guardado["dist_m"]) < 30:
+                es_duplicado = True
+                break
+                
+        if not es_duplicado:
+            deas_filtrados.append(dea)
+            
+        if len(deas_filtrados) == 3:
+            break
+            
+    return deas_filtrados
